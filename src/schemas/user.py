@@ -23,7 +23,6 @@ class UserOut(UserBase):
 
 class UserUpdate(BaseModel):
     name: str
-    phone: Optional[str] = None
     email: Optional[str] = None
 
 
