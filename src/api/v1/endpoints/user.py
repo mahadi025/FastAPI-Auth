@@ -5,7 +5,7 @@ from exceptions import handle_result
 from sqlalchemy.orm import Session
 from db import get_db
 from typing import List, Union
-from services import user_service
+from services import user_service, student_service, grade_service
 
 router = APIRouter()
 
@@ -31,3 +31,15 @@ def get_one(id, db: Session = Depends(get_db), current_user: Session = Depends(l
 def update_user(id: int, user_update: UserUpdate, db: Session = Depends(get_db), current_user: Session = Depends(logged_in)):
     update = user_service.update(db, id, data_update=user_update)
     return handle_result(update)
+
+@router.delete('/{id}')
+def delete_user(id: int, db: Session = Depends(get_db), current_user: Session = Depends(logged_in)):
+    try:
+        student_id = student_service.get_by_key_first(db, user_id=current_user.id).value.id
+        delete_student = student_service.delete(db, id=student_id)
+        grade_id = grade_service.get_by_key_first(db, student_id=student_id).value.id
+        delete_grade = grade_service.delete(db, id=grade_id)
+    except:
+        pass
+    delete = user_service.delete(db, id=id)
+    return handle_result(delete)
